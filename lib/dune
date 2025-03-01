@@ -1,0 +1,12 @@
+(library
+ (name karel_compiler)
+ (libraries core)
+ (preprocess
+  (pps ppx_deriving.show ppx_jane)))
+
+(ocamllex
+ (modules lexerjs))
+
+(menhir
+ (modules parserjs)
+ (flags --strict))
