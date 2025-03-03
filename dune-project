@@ -25,8 +25,11 @@
   menhir
   core
   core_unix
+  yojson
   ppx_deriving
-  ppx_jane)
+  ppx_deriving_yojson
+  ppx_jane
+  ppx_yojson_conv)
  (tags
   ("add topics" "to describe" your project)))
 

@@ -1,8 +1,8 @@
 (library
  (name karel_compiler)
- (libraries core)
+ (libraries core yojson)
  (preprocess
-  (pps ppx_deriving.show ppx_jane)))
+  (pps ppx_deriving.enum ppx_deriving.show ppx_jane ppx_yojson_conv)))
 
 (ocamllex
  (modules lexerjs))
