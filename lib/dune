@@ -5,8 +5,8 @@
   (pps ppx_deriving.enum ppx_deriving.show ppx_jane ppx_yojson_conv)))
 
 (ocamllex
- (modules lexerjs))
+ (modules lexer))
 
 (menhir
- (modules parserjs)
+ (modules parser)
  (flags --strict))

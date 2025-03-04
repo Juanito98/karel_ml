@@ -1,6 +1,6 @@
 (** File lexer.mll *)
 {
-open Parserjs        (* The type token is defined in parser.mli *)
+open Parser        (* The type token is defined in parser.mli *)
 exception InvalidToken
 }
 rule token = parse

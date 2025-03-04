@@ -32,8 +32,8 @@ program_def:
 ;
 
 def:
-    | VOID; i = ID; LPAREN; RPAREN; b = block               { (i, None, b) }
-    | VOID; i = ID; LPAREN; arg = ID; RPAREN; b = block;    { (i, Some arg, b) }
+    | VOID; i = ID; LPAREN; RPAREN; b = block               { Ast.Def (i, None, b) }
+    | VOID; i = ID; LPAREN; arg = ID; RPAREN; b = block;    { Ast.Def (i, Some arg, b) }
 
 block:
     | LBRACE; s = statement+; RBRACE                        { s }
@@ -47,10 +47,10 @@ statement:
     | call; SEMICOLON                                   { $1 }
 
 statement_fun:
-    | MOVE                                              { Ast.Move }
+    | MOVE                                              { Ast.Move  }
     | PICKBEEPER                                        { Ast.PickBeeper }
     | PUTBEEPER                                         { Ast.PutBeeper }
-    | RETURN                                            { Ast.Return }
+    | RETURN                                            { Ast.Return  }
     | TURNLEFT                                          { Ast.TurnLeft }
     | TURNOFF                                           { Ast.TurnOff }
 

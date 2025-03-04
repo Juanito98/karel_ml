@@ -1,7 +1,7 @@
 open! Core
 module Ast = Karel_compiler.Ast
-module Lexer = Karel_compiler.Lexerjs
-module Parser = Karel_compiler.Parserjs
+module Lexer = Karel_compiler.Lexer
+module Parser = Karel_compiler.Parser
 
 let parse_and_print input =
   let result = Karel_compiler.Main.parse input in

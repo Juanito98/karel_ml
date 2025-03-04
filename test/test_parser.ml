@@ -1,7 +1,7 @@
 open! Core
 module Ast = Karel_compiler.Ast
-module Lexer = Karel_compiler.Lexerjs
-module Parser = Karel_compiler.Parserjs
+module Lexer = Karel_compiler.Lexer
+module Parser = Karel_compiler.Parser
 
 let parse_and_print input =
   let lexbuf = Lexing.from_string input in
@@ -158,6 +158,6 @@ class program {
   [%expect
     {|
     (Program
-     ((turnright () ((Iterate (Int 3) (Block (TurnLeft)))))
-      (turn (x) ((Iterate (Var x) (Block (TurnLeft))))))
+     ((Def turnright () ((Iterate (Int 3) (Block (TurnLeft)))))
+      (Def turn (x) ((Iterate (Var x) (Block (TurnLeft))))))
      (Main ((Call turnright ()) (Call turn ((Int 2))) TurnOff))) |}]
