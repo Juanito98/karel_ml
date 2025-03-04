@@ -13,16 +13,12 @@ type identifier = string [@@deriving sexp_of]
 
 type int_expr =
   | Int of int
-  | Var of string
   | Succ of int_expr
   | Pred of int_expr
+  | Var of string
 [@@deriving sexp_of]
 
 type bool_expr =
-  | And of bool_expr * bool_expr
-  | Or of bool_expr * bool_expr
-  | Not of bool_expr
-  | IsZero of int_expr
   | FrontIsClear
   | LeftIsClear
   | RightIsClear
@@ -32,6 +28,10 @@ type bool_expr =
   | FacingWest
   | NextToABeeper
   | AnyBeepersInBeeperBag
+  | And of bool_expr * bool_expr
+  | Or of bool_expr * bool_expr
+  | Not of bool_expr
+  | IsZero of int_expr
 [@@deriving sexp_of]
 
 type block = statement list [@@deriving sexp_of]

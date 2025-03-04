@@ -7,11 +7,7 @@
 
 open! Core
 
-type stack_frame = {
-  pc : int;
-  arg : int;  (** The argument to the function. *)
-  sp : int; (* The function stack pointer. *)
-}
+type stack_frame = { pc : int; arg : int  (** The argument to the function. *) }
 
 module Instruction_counter = struct
   type t = { mutable counter : int; limit : int option }
@@ -59,6 +55,7 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
   let module Array = Array.Permissioned in
   let continue () =
     (* Returns continue, but checks if no violation was made. *)
+    t.pc <- t.pc + 1;
     if
       List.exists
         [
@@ -112,21 +109,25 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
       continue ()
   | AND ->
       let e1 = Stack.pop_exn t.expression_stack in
-      let e2 = Stack.top_exn t.expression_stack in
+      let e2 = Stack.pop_exn t.expression_stack in
       Stack.push t.expression_stack (e1 land e2);
       continue ()
   | OR ->
       let e1 = Stack.pop_exn t.expression_stack in
-      let e2 = Stack.top_exn t.expression_stack in
+      let e2 = Stack.pop_exn t.expression_stack in
       Stack.push t.expression_stack (e1 land e2);
       continue ()
   | EQ ->
       let e1 = Stack.pop_exn t.expression_stack in
-      let e2 = Stack.top_exn t.expression_stack in
+      let e2 = Stack.pop_exn t.expression_stack in
       Stack.push t.expression_stack (if e1 = e2 then 1 else 0);
       continue ()
   | EZ result ->
       if Stack.pop_exn t.expression_stack = 0 then Stop result else continue ()
+  | JMP jmp ->
+      Instruction_counter.incr t.ic;
+      t.pc <- t.pc + jmp;
+      continue ()
   | JZ jmp ->
       Instruction_counter.incr t.ic;
       if Stack.pop_exn t.expression_stack = 0 then t.pc <- t.pc + jmp;
@@ -169,6 +170,25 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
       let i = Stack.pop_exn t.expression_stack in
       Stack.push t.expression_stack (i + 1);
       continue ()
+  | PARAM _ ->
+      let frame = Stack.top_exn t.function_stack in
+      Stack.push t.expression_stack frame.arg;
+      continue ()
+  | CALL (pc, _) ->
+      Instruction_counter.incr t.ic;
+      let arg = Stack.pop_exn t.expression_stack in
+      let frame = { pc = t.pc; arg } in
+      Stack.push t.function_stack frame;
+      t.pc <- pc;
+      continue ()
+  | RET -> (
+      match Stack.pop t.function_stack with
+      | None ->
+          (* It is a return from the main function. *)
+          Stop OK
+      | Some frame ->
+          t.pc <- frame.pc;
+          continue ())
 
 let[@tailrec] rec run t
     (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
