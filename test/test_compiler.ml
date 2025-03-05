@@ -31,9 +31,9 @@ let%expect_test _ =
      4|   }
      5| }
     ===		AST  	===
-    (Program () (Main (TurnOff)))
+    (Program () (Main ((TurnOff <opaque>))))
     ===		IR   	===
-    ((defs ()) (main (HALT)))
+    ((defs ()) (main ((LINE 3) HALT)))
 
     simple statements
     ------------------
@@ -47,13 +47,16 @@ let%expect_test _ =
      8|   }
      9| }
     ===		AST  	===
-    (Program () (Main (Move PickBeeper PutBeeper TurnLeft TurnOff)))
+    (Program ()
+     (Main
+      ((Move <opaque>) (PickBeeper <opaque>) (PutBeeper <opaque>)
+       (TurnLeft <opaque>) (TurnOff <opaque>))))
     ===		IR   	===
     ((defs ())
      (main
-      (WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD WORLDBUZZERS
-       (EZ WORLDUNDERFLOW) PICKBUZZER BAGBUZZERS (EZ BAGUNDERFLOW) LEAVEBUZZER
-       LEFT HALT)))
+      ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 4)
+       WORLDBUZZERS (EZ WORLDUNDERFLOW) PICKBUZZER (LINE 5) BAGBUZZERS
+       (EZ BAGUNDERFLOW) LEAVEBUZZER (LINE 6) LEFT (LINE 7) HALT)))
 
     simple if
     ----------
@@ -66,12 +69,15 @@ let%expect_test _ =
      7|   }
      8| }
     ===		AST  	===
-    (Program () (Main ((If FrontIsClear (Block (Move)) (Block ())) TurnOff)))
+    (Program ()
+     (Main
+      ((If <opaque> FrontIsClear (Block ((Move <opaque>))) (Block ()))
+       (TurnOff <opaque>))))
     ===		IR   	===
     ((defs ())
      (main
-      (WORLDWALLS ORIENTATION MASK AND NOT (JZ 7) WORLDWALLS ORIENTATION MASK AND
-       NOT (EZ WALL) FORWARD HALT)))
+      ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) (LINE 4) WORLDWALLS
+       ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT)))
 
     if else
     --------
@@ -87,12 +93,16 @@ let%expect_test _ =
     10| }
     ===		AST  	===
     (Program ()
-     (Main ((If FrontIsClear (Block (Move)) (Block (TurnLeft))) TurnOff)))
+     (Main
+      ((If <opaque> FrontIsClear (Block ((Move <opaque>)))
+        (Block ((TurnLeft <opaque>))))
+       (TurnOff <opaque>))))
     ===		IR   	===
     ((defs ())
      (main
-      (WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) WORLDWALLS ORIENTATION MASK AND
-       NOT (EZ WALL) FORWARD (JMP 1) LEFT HALT)))
+      ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
+       ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP 2) (LINE 6) LEFT (LINE 8)
+       HALT)))
 
     nested if/else
     ---------------
@@ -106,13 +116,17 @@ let%expect_test _ =
      8| }
     ===		AST  	===
     (Program ()
-     (Main ((If FrontIsClear (If NextToABeeper Move TurnLeft) PutBeeper))))
+     (Main
+      ((If <opaque> FrontIsClear
+        (If <opaque> NextToABeeper (Move <opaque>) (TurnLeft <opaque>))
+        (PutBeeper <opaque>)))))
     ===		IR   	===
     ((defs ())
      (main
-      (WORLDWALLS ORIENTATION MASK AND NOT (JZ 15) WORLDBUZZERS (LOAD 0) EQ NOT
-       (JZ 8) WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP 1) LEFT
-       (JMP 3) BAGBUZZERS (EZ BAGUNDERFLOW) LEAVEBUZZER)))
+      ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 18) (LINE 4) WORLDBUZZERS
+       (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION MASK AND NOT
+       (EZ WALL) FORWARD (JMP 2) (LINE 5) LEFT (JMP 4) (LINE 6) BAGBUZZERS
+       (EZ BAGUNDERFLOW) LEAVEBUZZER)))
 
     simple while
     -------------
@@ -125,12 +139,15 @@ let%expect_test _ =
      7|   }
      8| }
     ===		AST  	===
-    (Program () (Main ((While FrontIsClear (Block (Move))) TurnOff)))
+    (Program ()
+     (Main
+      ((While <opaque> FrontIsClear (Block ((Move <opaque>))))
+       (TurnOff <opaque>))))
     ===		IR   	===
     ((defs ())
      (main
-      (WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) WORLDWALLS ORIENTATION MASK AND
-       NOT (EZ WALL) FORWARD (JMP -13) HALT)))
+      ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
+       ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT)))
 
     multiple conditions
     --------------------
@@ -144,14 +161,14 @@ let%expect_test _ =
     ===		AST  	===
     (Program ()
      (Main
-      ((If (And (Not FrontIsClear) (Or LeftIsClear (Not FacingNorth)))
-        (Block (Move)) (Block ())))))
+      ((If <opaque> (And (Not FrontIsClear) (Or LeftIsClear (Not FacingNorth)))
+        (Block ((Move <opaque>))) (Block ())))))
     ===		IR   	===
     ((defs ())
      (main
-      (WORLDWALLS ORIENTATION MASK AND NOT NOT WORLDWALLS ORIENTATION ROTL MASK
-       AND NOT ORIENTATION (LOAD 1) EQ NOT OR AND (JZ 7) WORLDWALLS ORIENTATION
-       MASK AND NOT (EZ WALL) FORWARD)))
+      ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT NOT WORLDWALLS ORIENTATION
+       ROTL MASK AND NOT ORIENTATION (LOAD 1) EQ NOT OR AND (JZ 8) (LINE 4)
+       WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD)))
 
     simple iterate
     ---------------
@@ -164,12 +181,15 @@ let%expect_test _ =
      7|   }
      8| }
     ===		AST  	===
-    (Program () (Main ((Iterate (Int 5) (Block (Move))) TurnOff)))
+    (Program ()
+     (Main
+      ((Iterate <opaque> (Int 5) (Block ((Move <opaque>)))) (TurnOff <opaque>))))
     ===		IR   	===
     ((defs ())
      (main
-      ((LOAD 5) DUP (LOAD 0) EQ NOT (JZ 8) WORLDWALLS ORIENTATION MASK AND NOT
-       (EZ WALL) FORWARD DEC (JMP -13) POP HALT)))
+      ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS
+       ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -14) POP (LINE 6)
+       HALT)))
 
     simple call
     ------------
@@ -186,13 +206,17 @@ let%expect_test _ =
     11|   }
     12| }
     ===		AST  	===
-    (Program ((Def turnright () ((Iterate (Int 3) (Block (TurnLeft))))))
-     (Main ((Call turnright ()) TurnOff)))
+    (Program
+     ((Def turnright ()
+       ((Iterate <opaque> (Int 3) (Block ((TurnLeft <opaque>)))))))
+     (Main ((Call <opaque> turnright ()) (TurnOff <opaque>))))
     ===		IR   	===
     ((defs
       (((name turnright) (arg ())
-        (body ((LOAD 3) DUP (LOAD 0) EQ NOT (JZ 2) LEFT DEC (JMP -7) POP)))))
-     (main ((LOAD 0) (CALL turnright) HALT)))
+        (body
+         ((LINE 3) (LOAD 3) DUP (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC
+          (JMP -8) POP RET)))))
+     (main ((LINE 9) (LOAD 0) (CALL turnright) (LINE 10) HALT)))
 
     simple call with arg
     ---------------------
@@ -209,10 +233,13 @@ let%expect_test _ =
     11|   }
     12| }
     ===		AST  	===
-    (Program ((Def turn (x) ((Iterate (Var x) (Block (TurnLeft))))))
-     (Main ((Call turn ((Int 2))) TurnOff)))
+    (Program
+     ((Def turn (x) ((Iterate <opaque> (Var x) (Block ((TurnLeft <opaque>)))))))
+     (Main ((Call <opaque> turn ((Int 2))) (TurnOff <opaque>))))
     ===		IR   	===
     ((defs
       (((name turn) (arg (x))
-        (body ((PARAM x) DUP (LOAD 0) EQ NOT (JZ 2) LEFT DEC (JMP -7) POP)))))
-     (main ((LOAD 2) (CALL turn) HALT))) |}]
+        (body
+         ((LINE 3) (PARAM x) DUP (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC
+          (JMP -8) POP RET)))))
+     (main ((LINE 9) (LOAD 2) (CALL turn) (LINE 10) HALT))) |}]

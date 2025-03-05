@@ -47,26 +47,26 @@ statement:
     | call; SEMICOLON                                   { $1 }
 
 statement_fun:
-    | MOVE                                              { Ast.Move  }
-    | PICKBEEPER                                        { Ast.PickBeeper }
-    | PUTBEEPER                                         { Ast.PutBeeper }
-    | RETURN                                            { Ast.Return  }
-    | TURNLEFT                                          { Ast.TurnLeft }
-    | TURNOFF                                           { Ast.TurnOff }
+    | MOVE                                              { Ast.Move $loc  }
+    | PICKBEEPER                                        { Ast.PickBeeper $loc }
+    | PUTBEEPER                                         { Ast.PutBeeper $loc }
+    | RETURN                                            { Ast.Return $loc }
+    | TURNLEFT                                          { Ast.TurnLeft $loc }
+    | TURNOFF                                           { Ast.TurnOff $loc }
 
 if_statement:
-    | IF; LPAREN; cond = bool_expr; RPAREN; i = statement %prec ELSE            { Ast.If (cond, i, Ast.Block []) }
-    | IF; LPAREN; cond = bool_expr; RPAREN; i = statement; ELSE; e = statement  { Ast.If (cond, i, e) }    
+    | IF; LPAREN; cond = bool_expr; RPAREN; i = statement %prec ELSE            { Ast.If ($loc, cond, i, Ast.Block []) }
+    | IF; LPAREN; cond = bool_expr; RPAREN; i = statement; ELSE; e = statement  { Ast.If ($loc, cond, i, e) }    
 
 while_statement:
-    | WHILE; LPAREN; cond = bool_expr; RPAREN; b = statement           { Ast.While (cond, b) }
+    | WHILE; LPAREN; cond = bool_expr; RPAREN; b = statement           { Ast.While ($loc, cond, b) }
 
 iterate_statement:
-    | ITERATE; LPAREN; i = int_expr; RPAREN; b = statement             { Ast.Iterate (i, b) }
+    | ITERATE; LPAREN; i = int_expr; RPAREN; b = statement             { Ast.Iterate ($loc, i, b) }
 
 call:
-    | ID; LPAREN; RPAREN                                { Ast.Call ($1, None) }
-    | ID; LPAREN; i = int_expr; RPAREN                      { Ast.Call ($1, Some i) }
+    | ID; LPAREN; RPAREN                                { Ast.Call ($loc, $1, None) }
+    | ID; LPAREN; i = int_expr; RPAREN                      { Ast.Call ($loc, $1, Some i) }
 
 bool_expr:
     | b = bool_fun | b = bool_fun; LPAREN; RPAREN           { b }

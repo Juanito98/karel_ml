@@ -12,6 +12,10 @@ type def_ir = { name : string; arg : string option; body : instruction_ir list }
 type ir = { defs : def_ir list; main : instruction_ir list }
 [@@deriving sexp_of]
 
+let start_line_of_loc loc =
+  let start = fst loc in
+  start.Ast.pos_lnum
+
 let rec bool_expr_ir = function
   | Ast.FrontIsClear -> [ Instruction.WORLDWALLS; ORIENTATION; MASK; AND; NOT ]
   | LeftIsClear -> [ Instruction.WORLDWALLS; ORIENTATION; ROTL; MASK; AND; NOT ]
@@ -36,49 +40,72 @@ and int_expr_ir = function
 
 let rec statement_to_ir = function
   | Ast.Block block -> block_to_ir block
-  | Move -> bool_expr_ir Ast.FrontIsClear @ [ EZ Run_result.WALL; FORWARD ]
-  | PickBeeper -> [ WORLDBUZZERS; EZ Run_result.WORLDUNDERFLOW; PICKBUZZER ]
-  | PutBeeper -> [ BAGBUZZERS; EZ Run_result.BAGUNDERFLOW; LEAVEBUZZER ]
-  | Return -> [ RET ]
-  | TurnLeft -> [ LEFT ]
-  | TurnOff -> [ HALT ]
-  | If (cond, i, e) -> (
+  | Move loc ->
+      [ Instruction.LINE (start_line_of_loc loc) ]
+      @ bool_expr_ir Ast.FrontIsClear
+      @ [ EZ Run_result.WALL; FORWARD ]
+  | PickBeeper loc ->
+      [
+        LINE (start_line_of_loc loc);
+        WORLDBUZZERS;
+        EZ Run_result.WORLDUNDERFLOW;
+        PICKBUZZER;
+      ]
+  | PutBeeper loc ->
+      [
+        LINE (start_line_of_loc loc);
+        BAGBUZZERS;
+        EZ Run_result.BAGUNDERFLOW;
+        LEAVEBUZZER;
+      ]
+  | Return loc -> [ LINE (start_line_of_loc loc); RET ]
+  | TurnLeft loc -> [ LINE (start_line_of_loc loc); LEFT ]
+  | TurnOff loc -> [ LINE (start_line_of_loc loc); HALT ]
+  | If (loc, cond, i, e) -> (
       let cond_ir = bool_expr_ir cond in
       let if_ir = statement_to_ir i in
       match statement_to_ir e with
-      | [] -> cond_ir @ [ Instruction.JZ (List.length if_ir) ] @ if_ir
+      | [] ->
+          [ Instruction.LINE (start_line_of_loc loc) ]
+          @ cond_ir
+          @ [ Instruction.JZ (List.length if_ir) ]
+          @ if_ir
       | else_ir ->
-          cond_ir
+          [ Instruction.LINE (start_line_of_loc loc) ]
+          @ cond_ir
           @ [ Instruction.JZ (List.length if_ir + 1) ]
           @ if_ir
           @ [ Instruction.JMP (List.length else_ir) ]
           @ else_ir)
-  | While (cond, statement) ->
+  | While (loc, cond, statement) ->
       let cond_ir = bool_expr_ir cond in
       let statement_ir = statement_to_ir statement in
-      cond_ir
+      [ Instruction.LINE (start_line_of_loc loc) ]
+      @ cond_ir
       @ [ Instruction.JZ (List.length statement_ir + 1) ]
       @ statement_ir
-      @ [ JMP (-(List.length cond_ir + 1 + List.length statement_ir)) ]
-  | Iterate (int_expr, statement) ->
+      @ [ JMP (-(1 + List.length cond_ir + 1 + List.length statement_ir)) ]
+  | Iterate (loc, int_expr, statement) ->
       let expr_ir = int_expr_ir int_expr in
       let statement_ir = statement_to_ir statement in
-      expr_ir
+      [ Instruction.LINE (start_line_of_loc loc) ]
+      @ expr_ir
       @ [ Instruction.DUP; LOAD 0; EQ; NOT; JZ (List.length statement_ir + 1) ]
       @ statement_ir
       @ [ Instruction.DEC; JMP (-(5 + List.length statement_ir + 1)); POP ]
-  | Call (arg, int_expr) ->
+  | Call (loc, arg, int_expr) ->
       let expr_ir =
         match int_expr with
         | None -> [ Instruction.LOAD 0 ]
         | Some int_expr -> int_expr_ir int_expr
       in
-      expr_ir @ [ CALL arg ]
+      [ Instruction.LINE (start_line_of_loc loc) ] @ expr_ir @ [ CALL arg ]
 
 and block_to_ir block = List.map block ~f:statement_to_ir |> List.concat
 
 let def_to_ir = function
-  | Ast.Def (name, arg, body) -> { name; arg; body = block_to_ir body }
+  | Ast.Def (name, arg, body) ->
+      { name; arg; body = block_to_ir body @ [ RET ] }
 
 let main_to_ir = function Ast.Main body -> block_to_ir body
 

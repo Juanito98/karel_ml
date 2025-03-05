@@ -6,9 +6,9 @@ type position = Lexing.position = {
   pos_bol : int;
   pos_cnum : int;
 }
-[@@deriving sexp_of]
+[@@deriving sexp]
 
-type loc = position * position [@@deriving sexp_of]
+type loc = (position * position[@sexp.opaque]) [@@deriving sexp_of]
 type identifier = string [@@deriving sexp_of]
 
 type int_expr =
@@ -38,16 +38,16 @@ type block = statement list [@@deriving sexp_of]
 
 and statement =
   | Block of block
-  | Move
-  | PickBeeper
-  | PutBeeper
-  | Return
-  | TurnLeft
-  | TurnOff
-  | If of bool_expr * statement * statement
-  | While of bool_expr * statement
-  | Iterate of int_expr * statement
-  | Call of identifier * int_expr option
+  | Move of loc
+  | PickBeeper of loc
+  | PutBeeper of loc
+  | Return of loc
+  | TurnLeft of loc
+  | TurnOff of loc
+  | If of loc * bool_expr * statement * statement
+  | While of loc * bool_expr * statement
+  | Iterate of loc * int_expr * statement
+  | Call of loc * identifier * int_expr option
 [@@deriving sexp_of]
 
 type def = Def of identifier * identifier option * block [@@deriving sexp_of]
