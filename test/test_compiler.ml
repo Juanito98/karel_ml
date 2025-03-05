@@ -3,6 +3,8 @@ module Ast = Karel_compiler.Ast
 module Lexer = Karel_compiler.Lexer
 module Parser = Karel_compiler.Parser
 module IR = Karel_compiler.Ir
+module Compiler = Karel_compiler.Compiler
+module Instruction = Karel_compiler.Instruction
 
 let parse_and_print (name, code) =
   let print_header = printf "===\t\t%-*s\t===\n" 5 in
@@ -17,6 +19,9 @@ let parse_and_print (name, code) =
   print_header "IR";
   print_s [%sexp (ir : IR.ir)];
 
+  let program = Compiler.link ir in
+  print_header "EXE";
+  print_s [%sexp (program : Instruction.t list)];
   printf "\n"
 
 let%expect_test _ =
@@ -34,6 +39,8 @@ let%expect_test _ =
     (Program () (Main ((TurnOff <opaque>))))
     ===		IR   	===
     ((defs ()) (main ((LINE 3) HALT)))
+    ===		EXE  	===
+    ((LINE 3) HALT)
 
     simple statements
     ------------------
@@ -57,6 +64,10 @@ let%expect_test _ =
       ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 4)
        WORLDBUZZERS (EZ WORLDUNDERFLOW) PICKBUZZER (LINE 5) BAGBUZZERS
        (EZ BAGUNDERFLOW) LEAVEBUZZER (LINE 6) LEFT (LINE 7) HALT)))
+    ===		EXE  	===
+    ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 4)
+     WORLDBUZZERS (EZ WORLDUNDERFLOW) PICKBUZZER (LINE 5) BAGBUZZERS
+     (EZ BAGUNDERFLOW) LEAVEBUZZER (LINE 6) LEFT (LINE 7) HALT)
 
     simple if
     ----------
@@ -78,6 +89,9 @@ let%expect_test _ =
      (main
       ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) (LINE 4) WORLDWALLS
        ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT)))
+    ===		EXE  	===
+    ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) (LINE 4) WORLDWALLS
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT)
 
     if else
     --------
@@ -103,6 +117,10 @@ let%expect_test _ =
       ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
        ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP 2) (LINE 6) LEFT (LINE 8)
        HALT)))
+    ===		EXE  	===
+    ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP 2) (LINE 6) LEFT (LINE 8)
+     HALT)
 
     nested if/else
     ---------------
@@ -127,6 +145,11 @@ let%expect_test _ =
        (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION MASK AND NOT
        (EZ WALL) FORWARD (JMP 2) (LINE 5) LEFT (JMP 4) (LINE 6) BAGBUZZERS
        (EZ BAGUNDERFLOW) LEAVEBUZZER)))
+    ===		EXE  	===
+    ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 18) (LINE 4) WORLDBUZZERS
+     (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION MASK AND NOT
+     (EZ WALL) FORWARD (JMP 2) (LINE 5) LEFT (JMP 4) (LINE 6) BAGBUZZERS
+     (EZ BAGUNDERFLOW) LEAVEBUZZER)
 
     simple while
     -------------
@@ -148,6 +171,9 @@ let%expect_test _ =
      (main
       ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
        ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT)))
+    ===		EXE  	===
+    ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT)
 
     multiple conditions
     --------------------
@@ -169,6 +195,10 @@ let%expect_test _ =
       ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT NOT WORLDWALLS ORIENTATION
        ROTL MASK AND NOT ORIENTATION (LOAD 1) EQ NOT OR AND (JZ 8) (LINE 4)
        WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD)))
+    ===		EXE  	===
+    ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT NOT WORLDWALLS ORIENTATION ROTL
+     MASK AND NOT ORIENTATION (LOAD 1) EQ NOT OR AND (JZ 8) (LINE 4) WORLDWALLS
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD)
 
     simple iterate
     ---------------
@@ -190,6 +220,9 @@ let%expect_test _ =
       ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS
        ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -14) POP (LINE 6)
        HALT)))
+    ===		EXE  	===
+    ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION
+     MASK AND NOT (EZ WALL) FORWARD DEC (JMP -14) POP (LINE 6) HALT)
 
     simple call
     ------------
@@ -207,7 +240,7 @@ let%expect_test _ =
     12| }
     ===		AST  	===
     (Program
-     ((Def turnright ()
+     ((Def <opaque> turnright ()
        ((Iterate <opaque> (Int 3) (Block ((TurnLeft <opaque>)))))))
      (Main ((Call <opaque> turnright ()) (TurnOff <opaque>))))
     ===		IR   	===
@@ -215,8 +248,12 @@ let%expect_test _ =
       (((name turnright) (arg ())
         (body
          ((LINE 3) (LOAD 3) DUP (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC
-          (JMP -8) POP RET)))))
+          (JMP -8) POP RET))
+        (line 2))))
      (main ((LINE 9) (LOAD 0) (CALL turnright) (LINE 10) HALT)))
+    ===		EXE  	===
+    ((LINE 9) (LOAD 0) (CALL (5 turnright)) (LINE 10) HALT (LINE 3) (LOAD 3) DUP
+     (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC (JMP -8) POP RET)
 
     simple call with arg
     ---------------------
@@ -234,12 +271,17 @@ let%expect_test _ =
     12| }
     ===		AST  	===
     (Program
-     ((Def turn (x) ((Iterate <opaque> (Var x) (Block ((TurnLeft <opaque>)))))))
+     ((Def <opaque> turn (x)
+       ((Iterate <opaque> (Var x) (Block ((TurnLeft <opaque>)))))))
      (Main ((Call <opaque> turn ((Int 2))) (TurnOff <opaque>))))
     ===		IR   	===
     ((defs
       (((name turn) (arg (x))
         (body
          ((LINE 3) (PARAM x) DUP (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC
-          (JMP -8) POP RET)))))
-     (main ((LINE 9) (LOAD 2) (CALL turn) (LINE 10) HALT))) |}]
+          (JMP -8) POP RET))
+        (line 2))))
+     (main ((LINE 9) (LOAD 2) (CALL turn) (LINE 10) HALT)))
+    ===		EXE  	===
+    ((LINE 9) (LOAD 2) (CALL (5 turn)) (LINE 10) HALT (LINE 3) (PARAM 0) DUP
+     (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC (JMP -8) POP RET) |}]

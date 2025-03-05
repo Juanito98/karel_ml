@@ -32,8 +32,8 @@ program_def:
 ;
 
 def:
-    | VOID; i = ID; LPAREN; RPAREN; b = block               { Ast.Def (i, None, b) }
-    | VOID; i = ID; LPAREN; arg = ID; RPAREN; b = block;    { Ast.Def (i, Some arg, b) }
+    | VOID; i = ID; LPAREN; RPAREN; b = block               { Ast.Def ($loc, i, None, b) }
+    | VOID; i = ID; LPAREN; arg = ID; RPAREN; b = block;    { Ast.Def ($loc, i, Some arg, b) }
 
 block:
     | LBRACE; s = statement+; RBRACE                        { s }

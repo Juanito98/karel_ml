@@ -50,6 +50,8 @@ and statement =
   | Call of loc * identifier * int_expr option
 [@@deriving sexp_of]
 
-type def = Def of identifier * identifier option * block [@@deriving sexp_of]
+type def = Def of loc * identifier * identifier option * block
+[@@deriving sexp_of]
+
 type program_def = Main of block [@@deriving sexp_of]
 type program = Program of def list * program_def [@@deriving sexp_of]

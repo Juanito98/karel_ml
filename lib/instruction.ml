@@ -3,18 +3,9 @@
 
 open! Core
 
-let int_of_yojson = function `Int n -> n | _ -> failwith "Expected an int"
-let yojson_of_int i = `Int i
-
-let string_of_yojson = function
-  | `String s -> s
-  | _ -> failwith "Could not convert Run_result.t to yojson"
-
-let yojson_of_string t = `String t
-
 type ('param, 'call) t' =
   | HALT (* Finish execution. *)
-  | LINE of int (* Record the line number. *)
+  | LINE of int (* Record the line number in the source code. *)
   | LEFT (* Turn left *)
   | WORLDWALLS
   (* Push the wall mask of Karel's current position onto the expression stack. *)
@@ -77,6 +68,6 @@ type ('param, 'call) t' =
     Moves the pc to the [int] line, where the called fun begins. 
     The [string] argument is used only on linking phase. *)
   | RET
-[@@deriving sexp, yojson]
+[@@deriving sexp]
 
-type t = (int, int * string) t' [@@deriving sexp, yojson]
+type t = (int, int * string) t' [@@deriving sexp]

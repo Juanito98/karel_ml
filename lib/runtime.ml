@@ -170,11 +170,11 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
       let i = Stack.pop_exn t.expression_stack in
       Stack.push t.expression_stack (i + 1);
       continue ()
-  | PARAM _ ->
+  | PARAM (_ : int) ->
       let frame = Stack.top_exn t.function_stack in
       Stack.push t.expression_stack frame.arg;
       continue ()
-  | CALL (pc, _) ->
+  | CALL (pc, (_ : string)) ->
       Instruction_counter.incr t.ic;
       let arg = Stack.pop_exn t.expression_stack in
       let frame = { pc = t.pc; arg } in

@@ -6,7 +6,13 @@ open! Core
 PARAM variants are not linked yet. *)
 type instruction_ir = (string, string) Instruction.t' [@@deriving sexp_of]
 
-type def_ir = { name : string; arg : string option; body : instruction_ir list }
+type def_ir = {
+  name : string;
+  arg : string option;
+  body : instruction_ir list;
+  line : int;
+      (* The line in the source code where the function definition was found. *)
+}
 [@@deriving sexp_of]
 
 type ir = { defs : def_ir list; main : instruction_ir list }
@@ -104,8 +110,13 @@ let rec statement_to_ir = function
 and block_to_ir block = List.map block ~f:statement_to_ir |> List.concat
 
 let def_to_ir = function
-  | Ast.Def (name, arg, body) ->
-      { name; arg; body = block_to_ir body @ [ RET ] }
+  | Ast.Def (loc, name, arg, body) ->
+      {
+        name;
+        arg;
+        body = block_to_ir body @ [ RET ];
+        line = start_line_of_loc loc;
+      }
 
 let main_to_ir = function Ast.Main body -> block_to_ir body
 
