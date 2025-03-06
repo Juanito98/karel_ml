@@ -1,6 +1,6 @@
 (library
  (name test_karel_compiler)
- (libraries karel_compiler yojson)
+ (libraries karel_compiler)
  (inline_tests)
  (preprocess
-  (pps ppx_jane ppx_expect ppx_inline_test ppx_yojson_conv)))
+  (pps ppx_jane ppx_expect ppx_inline_test)))

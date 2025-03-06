@@ -1,10 +1,3 @@
-(** A class that holds the state of computation and executes opcodes.
-
-    The Karel Virtual Machine is a simple, stack-based virtual machine with a
-    small number of opcodes, based loosely on the Java Virtual Machine. All
-    opcodes are represented as an array where the first element is the opcode
-    name, followed by zero or one parameters. *)
-
 open! Core
 
 type stack_frame = { pc : int; arg : int  (** The argument to the function. *) }
@@ -35,6 +28,7 @@ type t = {
   pickbuzzer_counter : Instruction_counter.t;
   leavebuzzer_counter : Instruction_counter.t;
 }
+[@@deriving fields ~getters ~setters]
 
 let create ?(instruction_limit = default_instruction_limit) ?left_limit
     ?forward_limit ?pickbuzzer_limit ?leavebuzzer_limit ~world () =

@@ -22,14 +22,15 @@ let parse_and_print (name, code) =
   let program = Compiler.link ir in
   print_header "EXE";
   print_s [%sexp (program : Instruction.t list)];
-  printf "\n"
+  print_endline "\n"
 
 let%expect_test _ =
   List.iter Utils.programs ~f:parse_and_print;
   [%expect
     {|
+    ------------------------------------------------------------
     simple program
-    ---------------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     turnoff();
@@ -42,8 +43,10 @@ let%expect_test _ =
     ===		EXE  	===
     ((LINE 3) HALT)
 
+
+    ------------------------------------------------------------
     simple statements
-    ------------------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     move();
@@ -69,8 +72,10 @@ let%expect_test _ =
      WORLDBUZZERS (EZ WORLDUNDERFLOW) PICKBUZZER (LINE 5) BAGBUZZERS
      (EZ BAGUNDERFLOW) LEAVEBUZZER (LINE 6) LEFT (LINE 7) HALT)
 
+
+    ------------------------------------------------------------
     simple if
-    ----------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     if (frontIsClear) {
@@ -93,8 +98,10 @@ let%expect_test _ =
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) (LINE 4) WORLDWALLS
      ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT)
 
+
+    ------------------------------------------------------------
     if else
-    --------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     if (frontIsClear) {
@@ -122,8 +129,10 @@ let%expect_test _ =
      ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP 2) (LINE 6) LEFT (LINE 8)
      HALT)
 
+
+    ------------------------------------------------------------
     nested if/else
-    ---------------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     if (frontIsClear)
@@ -151,8 +160,10 @@ let%expect_test _ =
      (EZ WALL) FORWARD (JMP 2) (LINE 5) LEFT (JMP 4) (LINE 6) BAGBUZZERS
      (EZ BAGUNDERFLOW) LEAVEBUZZER)
 
+
+    ------------------------------------------------------------
     simple while
-    -------------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     while (frontIsClear) {
@@ -175,8 +186,10 @@ let%expect_test _ =
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
      ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT)
 
+
+    ------------------------------------------------------------
     multiple conditions
-    --------------------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     if (!frontIsClear && (leftIsClear || notFacingNorth)) {
@@ -200,8 +213,10 @@ let%expect_test _ =
      MASK AND NOT ORIENTATION (LOAD 1) EQ NOT OR AND (JZ 8) (LINE 4) WORLDWALLS
      ORIENTATION MASK AND NOT (EZ WALL) FORWARD)
 
+
+    ------------------------------------------------------------
     simple iterate
-    ---------------
+    ------------------------------------------------------------
      1| class program {
      2|   program() {
      3|     iterate (5) {
@@ -224,8 +239,10 @@ let%expect_test _ =
     ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION
      MASK AND NOT (EZ WALL) FORWARD DEC (JMP -14) POP (LINE 6) HALT)
 
+
+    ------------------------------------------------------------
     simple call
-    ------------
+    ------------------------------------------------------------
      1| class program {
      2|   void turnright() {
      3|     iterate (3) {
@@ -255,8 +272,10 @@ let%expect_test _ =
     ((LINE 9) (LOAD 0) (CALL (5 turnright)) (LINE 10) HALT (LINE 3) (LOAD 3) DUP
      (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC (JMP -8) POP RET)
 
+
+    ------------------------------------------------------------
     simple call with arg
-    ---------------------
+    ------------------------------------------------------------
      1| class program {
      2|   void turn(x) {
      3|     iterate (x) {

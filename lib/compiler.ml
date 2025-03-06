@@ -4,7 +4,7 @@ open! Core
     validation of the function declarations and calls, and then stitches
     together all the function definitions, resolves calls, and ensures that all
     parameters have been correctly resolved. *)
-let link ({ defs; main } : Ir.ir) =
+let link ({ defs; main } : Ir.ir) : Instruction.t list =
   let _, functions =
     (* The function definitions will be appended below the main instructions.
     This calculates the offset in the final instruction list where the function will
@@ -45,3 +45,7 @@ let link ({ defs; main } : Ir.ir) =
   @ (List.map defs ~f:(fun { name = _; line; arg; body } ->
          transform body arg ~line)
     |> List.concat)
+
+(** Performs the full compilation of the code. *)
+let compile code : Instruction.t list =
+  Lexing.from_string code |> Parser.program Lexer.token |> Ir.ast_to_ir |> link

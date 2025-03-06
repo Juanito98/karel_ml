@@ -134,6 +134,7 @@ class program {
 
 let print_program (name, code) =
   let lines = String.split_lines code in
+  print_endline (String.make 60 '-');
   print_endline name;
-  print_endline (String.make (String.length name + 1) '-');
+  print_endline (String.make 60 '-');
   lines |> List.iteri ~f:(fun i line -> printf "%*d| %s\n" 2 (i + 1) line)
