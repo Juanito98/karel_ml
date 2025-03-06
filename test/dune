@@ -1,6 +1,6 @@
 (library
  (name test_karel_compiler)
- (libraries karel_compiler)
+ (libraries karel_compiler notty)
  (inline_tests)
  (preprocess
   (pps ppx_jane ppx_expect ppx_inline_test)))

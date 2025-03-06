@@ -5,7 +5,7 @@ open! Core
 let k_infinity = Int.max_value
 
 module Orientation = struct
-  type t = West | North | East | South [@@deriving enum]
+  type t = West | North | East | South [@@deriving sexp_of, enum]
 
   let left = function
     | North -> West
@@ -24,14 +24,18 @@ module Orientation = struct
 end
 
 module Walls = struct
-  type t = int
+  type t = int [@@deriving sexp_of]
 
   let to_int t : t = t
   let empty : t = 0
 
-  let add t orientation =
-    let b = 1 lsl Orientation.to_enum orientation in
+  let add t ~orientation =
+    let b = 1 lsl Orientation.to_int orientation in
     t lor b
+
+  let wall_in t orientation =
+    let b = 1 lsl Orientation.to_int orientation in
+    t land b > 0
 end
 
 module Position = struct
@@ -44,8 +48,8 @@ module Position = struct
     match orientation with
     | Orientation.North -> (x, y + 1)
     | South -> (x, y - 1)
-    | East -> (x - 1, y)
-    | West -> (x + 1, y)
+    | East -> (x + 1, y)
+    | West -> (x - 1, y)
 end
 
 let default_width = 100
@@ -65,7 +69,7 @@ type t = {
   walls : (Position.t, Walls.t) Hashtbl.t;
       (** The wall mask at each position. (Excluding world boundaries ) *)
 }
-[@@deriving fields ~getters ~setters]
+[@@deriving sexp_of, fields ~getters ~setters]
 
 let create ?(width = default_width) ?(height = default_height)
     ?(position = default_position) ?(orientation = default_orientation)
@@ -93,22 +97,32 @@ let putbeeper t =
   incr_bag t (-1);
   incr_world_beepers t 1
 
-let wall_mask t =
+let out_of_boundaries t (x, y) = x > t.width || y > t.height
+
+let wall_mask_of t position =
   let wall_mask =
-    Hashtbl.find t.walls t.position |> Option.value ~default:Walls.empty
+    Hashtbl.find t.walls position |> Option.value ~default:Walls.empty
   in
   let wall_mask =
-    if Position.x t.position = 0 then Walls.add wall_mask West else wall_mask
-  in
-  let wall_mask =
-    if Position.x t.position = t.width then Walls.add wall_mask East
+    if Position.x position = 1 || out_of_boundaries t position then
+      Walls.add wall_mask ~orientation:West
     else wall_mask
   in
   let wall_mask =
-    if Position.y t.position = 0 then Walls.add wall_mask South else wall_mask
+    if Position.x position = t.width || out_of_boundaries t position then
+      Walls.add wall_mask ~orientation:East
+    else wall_mask
   in
   let wall_mask =
-    if Position.y t.position = t.height then Walls.add wall_mask North
+    if Position.y position = 1 || out_of_boundaries t position then
+      Walls.add wall_mask ~orientation:South
+    else wall_mask
+  in
+  let wall_mask =
+    if Position.y position = t.height || out_of_boundaries t position then
+      Walls.add wall_mask ~orientation:North
     else wall_mask
   in
   wall_mask
+
+let wall_mask t = wall_mask_of t t.position

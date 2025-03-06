@@ -232,12 +232,12 @@ let%expect_test _ =
     ===		IR   	===
     ((defs ())
      (main
-      ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS
-       ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -14) POP (LINE 6)
+      ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 10) (LINE 4) WORLDWALLS
+       ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -15) POP (LINE 6)
        HALT)))
     ===		EXE  	===
-    ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION
-     MASK AND NOT (EZ WALL) FORWARD DEC (JMP -14) POP (LINE 6) HALT)
+    ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 10) (LINE 4) WORLDWALLS
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -15) POP (LINE 6) HALT)
 
 
     ------------------------------------------------------------
@@ -264,13 +264,13 @@ let%expect_test _ =
     ((defs
       (((name turnright) (arg ())
         (body
-         ((LINE 3) (LOAD 3) DUP (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC
-          (JMP -8) POP RET))
+         ((LINE 3) (LOAD 3) DUP (LOAD 0) EQ NOT (JZ 4) (LINE 4) LEFT DEC
+          (JMP -9) POP RET))
         (line 2))))
      (main ((LINE 9) (LOAD 0) (CALL turnright) (LINE 10) HALT)))
     ===		EXE  	===
     ((LINE 9) (LOAD 0) (CALL (5 turnright)) (LINE 10) HALT (LINE 3) (LOAD 3) DUP
-     (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC (JMP -8) POP RET)
+     (LOAD 0) EQ NOT (JZ 4) (LINE 4) LEFT DEC (JMP -9) POP RET)
 
 
     ------------------------------------------------------------
@@ -297,10 +297,10 @@ let%expect_test _ =
     ((defs
       (((name turn) (arg (x))
         (body
-         ((LINE 3) (PARAM x) DUP (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC
-          (JMP -8) POP RET))
+         ((LINE 3) (PARAM x) DUP (LOAD 0) EQ NOT (JZ 4) (LINE 4) LEFT DEC
+          (JMP -9) POP RET))
         (line 2))))
      (main ((LINE 9) (LOAD 2) (CALL turn) (LINE 10) HALT)))
     ===		EXE  	===
     ((LINE 9) (LOAD 2) (CALL (5 turn)) (LINE 10) HALT (LINE 3) (PARAM 0) DUP
-     (LOAD 0) EQ NOT (JZ 3) (LINE 4) LEFT DEC (JMP -8) POP RET) |}]
+     (LOAD 0) EQ NOT (JZ 4) (LINE 4) LEFT DEC (JMP -9) POP RET) |}]

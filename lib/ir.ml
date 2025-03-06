@@ -96,9 +96,9 @@ let rec statement_to_ir = function
       let statement_ir = statement_to_ir statement in
       [ Instruction.LINE (start_line_of_loc loc) ]
       @ expr_ir
-      @ [ Instruction.DUP; LOAD 0; EQ; NOT; JZ (List.length statement_ir + 1) ]
+      @ [ Instruction.DUP; LOAD 0; EQ; NOT; JZ (List.length statement_ir + 2) ]
       @ statement_ir
-      @ [ Instruction.DEC; JMP (-(5 + List.length statement_ir + 1)); POP ]
+      @ [ Instruction.DEC; JMP (-(5 + List.length statement_ir + 1) - 1); POP ]
   | Call (loc, arg, int_expr) ->
       let expr_ir =
         match int_expr with

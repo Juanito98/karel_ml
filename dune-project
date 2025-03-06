@@ -25,6 +25,7 @@
   menhir
   core
   core_unix
+  notty
   ppx_deriving
   ppx_jane)
  (tags

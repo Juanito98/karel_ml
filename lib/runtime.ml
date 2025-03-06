@@ -1,9 +1,10 @@
 open! Core
 
 type stack_frame = { pc : int; arg : int  (** The argument to the function. *) }
+[@@deriving sexp_of]
 
 module Instruction_counter = struct
-  type t = { mutable counter : int; limit : int option }
+  type t = { mutable counter : int; limit : int option } [@@deriving sexp_of]
 
   let create ~limit = { limit; counter = 0 }
 
@@ -173,7 +174,7 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
       let arg = Stack.pop_exn t.expression_stack in
       let frame = { pc = t.pc; arg } in
       Stack.push t.function_stack frame;
-      t.pc <- pc;
+      t.pc <- pc - 1;
       continue ()
   | RET -> (
       match Stack.pop t.function_stack with

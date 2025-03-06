@@ -1,6 +1,6 @@
 (library
  (name karel_compiler)
- (libraries core)
+ (libraries core core_unix notty notty.unix)
  (preprocess
   (pps ppx_deriving.enum ppx_deriving.show ppx_jane)))
 
