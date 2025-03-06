@@ -2,6 +2,6 @@
  (public_name karel_compiler)
  (name main)
  (promote (until-clean))
- (libraries core core_unix.command_unix karel_compiler)
+ (libraries karel_compiler)
  (preprocess
   (pps ppx_jane)))

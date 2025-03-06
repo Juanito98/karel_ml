@@ -79,7 +79,11 @@ let create ?(width = default_width) ?(height = default_height)
 
 let turnleft t = set_orientation t (Orientation.left t.orientation)
 let forward t = set_position t (Position.move t.position t.orientation)
-let beepers t = Hashtbl.find t.beepers t.position |> Option.value ~default:0
+
+let beepers_of t position =
+  Hashtbl.find t.beepers position |> Option.value ~default:0
+
+let beepers t = beepers_of t t.position
 
 let incr_world_beepers t delta =
   Hashtbl.change t.beepers t.position ~f:(fun beepers ->

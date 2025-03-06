@@ -29,7 +29,7 @@ type t = {
   pickbuzzer_counter : Instruction_counter.t;
   leavebuzzer_counter : Instruction_counter.t;
 }
-[@@deriving fields ~getters ~setters]
+[@@deriving sexp_of, fields ~getters ~setters]
 
 let create ?(instruction_limit = default_instruction_limit) ?left_limit
     ?forward_limit ?pickbuzzer_limit ?leavebuzzer_limit ~world () =
@@ -184,6 +184,16 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
       | Some frame ->
           t.pc <- frame.pc;
           continue ())
+
+let[@tailrec] rec line_step t
+    (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
+  match step t program with
+  | Continue_or_stop.Stop result -> Continue_or_stop.Stop result
+  | Continue () -> (
+      let instruction = Array.Permissioned.nget program t.pc in
+      match instruction with
+      | Instruction.LINE _ -> Continue ()
+      | _ -> line_step t program)
 
 let[@tailrec] rec run t
     (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =

@@ -36,7 +36,11 @@ val turnleft : t -> unit
 val forward : t -> unit
 val pickbeeper : t -> unit
 val putbeeper : t -> unit
+
 val beepers : t -> int
+(** Returns the number of beepers in Karel's current position. *)
+
+val beepers_of : t -> Position.t -> int
 
 val wall_mask : t -> Walls.t
 (** Returns the wall mask of the Karel's current position.*)
