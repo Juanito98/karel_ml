@@ -6,9 +6,9 @@ module IR = Karel_compiler.Ir
 module Compiler = Karel_compiler.Compiler
 module Instruction = Karel_compiler.Instruction
 
-let parse_and_print (name, code) =
+let compile_and_print code =
+  let code = String.strip code in
   let print_header = printf "===\t\t%-*s\t===\n" 5 in
-  Utils.print_program (name, code);
 
   let lexbuf = Lexing.from_string code in
   let ast = Parser.program Lexer.token lexbuf in
@@ -24,38 +24,38 @@ let parse_and_print (name, code) =
   print_s [%sexp (program : Instruction.t list)];
   print_endline "\n"
 
-let%expect_test _ =
-  List.iter Utils.programs ~f:parse_and_print;
+let%expect_test "simple program" =
+  compile_and_print {|
+class program {
+  program() {
+    turnoff();
+  }
+}
+  |};
   [%expect
     {|
-    ------------------------------------------------------------
-    simple program
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     turnoff();
-     4|   }
-     5| }
     ===		AST  	===
     (Program () (Main ((TurnOff <opaque>))))
     ===		IR   	===
     ((defs ()) (main ((LINE 3) HALT)))
     ===		EXE  	===
-    ((LINE 3) HALT)
+    ((LINE 3) HALT) |}]
 
-
-    ------------------------------------------------------------
-    simple statements
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     move();
-     4|     pickbeeper();
-     5|     putbeeper();
-     6|     turnleft();
-     7|     turnoff();
-     8|   }
-     9| }
+let%expect_test "simple statements" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    move();
+    pickbeeper();
+    putbeeper();
+    turnleft();
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -70,20 +70,22 @@ let%expect_test _ =
     ===		EXE  	===
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 4)
      WORLDBUZZERS (EZ WORLDUNDERFLOW) PICKBUZZER (LINE 5) BAGBUZZERS
-     (EZ BAGUNDERFLOW) LEAVEBUZZER (LINE 6) LEFT (LINE 7) HALT)
+     (EZ BAGUNDERFLOW) LEAVEBUZZER (LINE 6) LEFT (LINE 7) HALT) |}]
 
-
-    ------------------------------------------------------------
-    simple if
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     if (frontIsClear) {
-     4|       move();
-     5|     }
-     6|     turnoff();
-     7|   }
-     8| }
+let%expect_test "simple if" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    if (frontIsClear) {
+      move();
+    }
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -96,22 +98,24 @@ let%expect_test _ =
        ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT)))
     ===		EXE  	===
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 8) (LINE 4) WORLDWALLS
-     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT)
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (LINE 6) HALT) |}]
 
-
-    ------------------------------------------------------------
-    if else
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     if (frontIsClear) {
-     4|       move();
-     5|     } else {
-     6|       turnleft();
-     7|     }
-     8|     turnoff();
-     9|   }
-    10| }
+let%expect_test "if else" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    if (frontIsClear) {
+      move();
+    } else {
+      turnleft();
+    }
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -127,20 +131,22 @@ let%expect_test _ =
     ===		EXE  	===
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
      ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP 2) (LINE 6) LEFT (LINE 8)
-     HALT)
+     HALT) |}]
 
-
-    ------------------------------------------------------------
-    nested if/else
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     if (frontIsClear)
-     4|       if (nextToABeeper) move();
-     5|       else turnleft();
-     6|     else putbeeper();
-     7|   }
-     8| }
+let%expect_test "nested if/else" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    if (frontIsClear)
+      if (nextToABeeper) move();
+      else turnleft();
+    else putbeeper();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -158,20 +164,22 @@ let%expect_test _ =
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 18) (LINE 4) WORLDBUZZERS
      (LOAD 0) EQ NOT (JZ 9) (LINE 4) WORLDWALLS ORIENTATION MASK AND NOT
      (EZ WALL) FORWARD (JMP 2) (LINE 5) LEFT (JMP 4) (LINE 6) BAGBUZZERS
-     (EZ BAGUNDERFLOW) LEAVEBUZZER)
+     (EZ BAGUNDERFLOW) LEAVEBUZZER) |}]
 
-
-    ------------------------------------------------------------
-    simple while
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     while (frontIsClear) {
-     4|       move();
-     5|     }
-     6|     turnoff();
-     7|   }
-     8| }
+let%expect_test "simple while" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    while (frontIsClear) {
+      move();
+    }
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -184,19 +192,21 @@ let%expect_test _ =
        ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT)))
     ===		EXE  	===
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT (JZ 9) (LINE 4) WORLDWALLS
-     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT)
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD (JMP -15) (LINE 6) HALT) |}]
 
-
-    ------------------------------------------------------------
-    multiple conditions
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     if (!frontIsClear && (leftIsClear || notFacingNorth)) {
-     4|       move();
-     5|     }
-     6|   }
-     7| }
+let%expect_test "multiple conditions" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    if (!frontIsClear && (leftIsClear || notFacingNorth)) {
+      move();
+    }
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -211,20 +221,22 @@ let%expect_test _ =
     ===		EXE  	===
     ((LINE 3) WORLDWALLS ORIENTATION MASK AND NOT NOT WORLDWALLS ORIENTATION ROTL
      MASK AND NOT ORIENTATION (LOAD 1) EQ NOT OR AND (JZ 8) (LINE 4) WORLDWALLS
-     ORIENTATION MASK AND NOT (EZ WALL) FORWARD)
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD) |}]
 
-
-    ------------------------------------------------------------
-    simple iterate
-    ------------------------------------------------------------
-     1| class program {
-     2|   program() {
-     3|     iterate (5) {
-     4|       move();
-     5|     }
-     6|     turnoff();
-     7|   }
-     8| }
+let%expect_test "simple iterate" =
+  compile_and_print
+    {|
+class program {
+  program() {
+    iterate (5) {
+      move();
+    }
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program ()
      (Main
@@ -237,24 +249,26 @@ let%expect_test _ =
        HALT)))
     ===		EXE  	===
     ((LINE 3) (LOAD 5) DUP (LOAD 0) EQ NOT (JZ 10) (LINE 4) WORLDWALLS
-     ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -15) POP (LINE 6) HALT)
+     ORIENTATION MASK AND NOT (EZ WALL) FORWARD DEC (JMP -15) POP (LINE 6) HALT) |}]
 
-
-    ------------------------------------------------------------
-    simple call
-    ------------------------------------------------------------
-     1| class program {
-     2|   void turnright() {
-     3|     iterate (3) {
-     4|       turnleft();
-     5|     }
-     6|   }
-     7|
-     8|   program() {
-     9|     turnright();
-    10|     turnoff();
-    11|   }
-    12| }
+let%expect_test "simple call" =
+  compile_and_print
+    {|
+class program {
+  void turnright() {
+    iterate (3) {
+      turnleft();
+    }
+  }
+  
+  program() {
+    turnright();
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program
      ((Def <opaque> turnright ()
@@ -270,24 +284,26 @@ let%expect_test _ =
      (main ((LINE 9) (LOAD 0) (CALL turnright) (LINE 10) HALT)))
     ===		EXE  	===
     ((LINE 9) (LOAD 0) (CALL (5 turnright)) (LINE 10) HALT (LINE 3) (LOAD 3) DUP
-     (LOAD 0) EQ NOT (JZ 4) (LINE 4) LEFT DEC (JMP -9) POP RET)
+     (LOAD 0) EQ NOT (JZ 4) (LINE 4) LEFT DEC (JMP -9) POP RET) |}]
 
-
-    ------------------------------------------------------------
-    simple call with arg
-    ------------------------------------------------------------
-     1| class program {
-     2|   void turn(x) {
-     3|     iterate (x) {
-     4|       turnleft();
-     5|     }
-     6|   }
-     7|
-     8|   program() {
-     9|     turn(2);
-    10|     turnoff();
-    11|   }
-    12| }
+let%expect_test "simple call with arg" =
+  compile_and_print
+    {|
+class program {  
+  void turn(x) {
+    iterate (x) {
+      turnleft();
+    }
+  }
+  
+  program() {
+    turn(2);
+    turnoff();
+  }
+}
+  |};
+  [%expect
+    {|
     ===		AST  	===
     (Program
      ((Def <opaque> turn (x)
