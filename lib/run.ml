@@ -7,8 +7,28 @@ let regular_file =
       | `No -> failwith "Not a regular file"
       | `Unknown -> failwith "Could not determine if this was a regular file")
 
+let exec_command =
+  Command.basic ~summary:"Executes the program"
+    ~readme:(fun () -> "More detailed information")
+    (let%map_open.Command filename = anon ("filename" %: regular_file)
+     and interactive = flag "-i" no_arg ~doc:"BOOL interactive mode" in
+     fun () ->
+       let program =
+         In_channel.read_all filename
+         |> Compiler.compile |> Array.Permissioned.of_list
+       in
+       let runtime =
+         In_channel.input_all In_channel.stdin |> World_in.load_xml
+       in
+       let result =
+         if interactive then Renderer.render runtime program
+         else Runtime.run runtime program
+       in
+       print_s [%sexp (result : Run_result.t)];
+       print_s [%sexp (runtime : Runtime.t)])
+
 let run_command =
-  Command.basic ~summary:"Compiles source file"
+  Command.basic ~summary:"Runs the compiled karel code"
     ~readme:(fun () -> "More detailed information")
     (let%map_open.Command filename = anon ("filename" %: regular_file) in
      fun () ->
@@ -44,6 +64,10 @@ let compile_command =
 
 let command =
   Command.group ~summary:"Karel the compiler"
-    [ ("compile", compile_command); ("run", run_command) ]
+    [
+      ("compile", compile_command);
+      ("run", run_command);
+      ("execute", exec_command);
+    ]
 
 let run () = Command_unix.run ~verbose_on_parse_error:true command

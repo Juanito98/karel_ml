@@ -27,7 +27,8 @@
   core_unix
   notty
   ppx_deriving
-  ppx_jane)
+  ppx_jane
+  xml-light)
  (tags
   ("add topics" "to describe" your project)))
 

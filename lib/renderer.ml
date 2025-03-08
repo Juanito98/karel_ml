@@ -2,6 +2,12 @@ open! Core
 module I = Notty.I
 module A = Notty.A
 
+let with_notty f =
+  let term = Notty_unix.Term.create () in
+  let x = f term in
+  Notty_unix.Term.release term;
+  x
+
 let grid cells = List.map cells ~f:I.hcat |> I.vcat
 
 let cell_img world position =
@@ -53,13 +59,15 @@ let world_img world =
   in
   I.hcat [ body; I.void 2 1; info ]
 
-let render () =
-  let world = World.create ~width:10 ~height:10 () in
-  let term = Notty_unix.Term.create () in
-  let img = world_img world in
-  Notty_unix.Term.image term img;
-  Core_unix.sleep 2;
-  World.forward world;
-  let img = world_img world in
-  Notty_unix.Term.image term img;
-  Core_unix.sleep 2
+let render runtime program =
+  with_notty (fun term ->
+      let[@tailrec] rec loop () =
+        match Runtime.line_step runtime program with
+        | Continue_or_stop.Continue () ->
+            Notty_unix.Term.image term (world_img (Runtime.world runtime));
+            let (_ : float) = Core_unix.nanosleep 0.05 in
+            loop ()
+        | Stop result -> result
+      in
+      Notty_unix.Term.image term (world_img (Runtime.world runtime));
+      loop ())

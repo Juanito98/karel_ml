@@ -16,7 +16,9 @@ end
 module Walls : sig
   type t
 
+  val empty : t
   val to_int : t -> int
+  val add : t -> orientation:Orientation.t -> t
   val wall_in : t -> Orientation.t -> bool
 end
 
@@ -24,6 +26,8 @@ module Position : sig
   type t = int * int [@@deriving sexp, compare, hash]
   (* (x, y) -> (column, row) *)
 end
+
+val k_infinity : int
 
 val orientation : t -> Orientation.t
 (** Returns the Karel's current orientation. *)
@@ -54,7 +58,7 @@ val create :
   ?orientation:Orientation.t ->
   ?bag:int ->
   ?beepers:(Position.t, int) Base.Hashtbl.t ->
-  ?walls:(Position.t, int) Base.Hashtbl.t ->
+  ?walls:(Position.t, Walls.t) Base.Hashtbl.t ->
   unit ->
   t
 
