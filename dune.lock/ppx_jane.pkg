@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -28,6 +28,7 @@
  ppx_stable
  ppx_stable_witness
  ppx_string
+ ppx_string_conv
  ppx_tydi
  ppx_typerep_conv
  ppx_variants_conv
@@ -37,6 +38,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/ppx_jane-v0.16.0.tar.gz)
+   https://github.com/janestreet/ppx_jane/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=9d53b01dd2e38bbe82b6927f43fa27e347418045409fd2cd3e2a203a9951c133)))
+   sha256=4dcf29dbb093f57fdda18b659739b255b66dc5566b6c4c8a35caa3ce8666fa65)))

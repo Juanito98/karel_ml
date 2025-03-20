@@ -1,17 +1,12 @@
-(version v0.12.4)
+(version v0.17.0)
 
 (build
- (progn
-  (when
-   %{pkg-self:dev}
-   (run dune subst))
-  (run dune build -p %{pkg-self:name} -j %{jobs} @install)))
+ (run dune build -p %{pkg-self:name} -j %{jobs}))
 
-(depends dune ocaml)
+(depends ocaml dune)
 
 (source
  (fetch
   (url
-   https://github.com/janestreet/ocaml-compiler-libs/releases/download/v0.12.4/ocaml-compiler-libs-v0.12.4.tbz)
-  (checksum
-   sha256=4ec9c9ec35cc45c18c7a143761154ef1d7663036a29297f80381f47981a07760)))
+   https://github.com/janestreet/ocaml-compiler-libs/archive/refs/tags/v0.17.0.tar.gz)
+  (checksum md5=aaf66efea8752475c25a942443579b41)))

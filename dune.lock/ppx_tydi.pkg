@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -8,6 +8,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/ppx_tydi-v0.16.0.tar.gz)
+   https://github.com/janestreet/ppx_tydi/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=a363153a1f58b35b789321dca9b5b03da46bc1c9152a38d307ffb338b3e25ac6)))
+   sha256=8d22dc50f0ec75380b893063a2294555dc325d21777bc09d2c6e201b391e4265)))

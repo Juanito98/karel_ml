@@ -1,4 +1,4 @@
-(version 2)
+(version 3)
 
 (build
  (substitute gen_ocaml_config.ml.in gen_ocaml_config.ml))
@@ -9,9 +9,9 @@
  (gen_ocaml_config.ml.in
   (fetch
    (url
-    https://raw.githubusercontent.com/ocaml/opam-source-archives/main/patches/ocaml-config/gen_ocaml_config.ml.in.2)
+    https://raw.githubusercontent.com/ocaml/opam-source-archives/main/patches/ocaml-config/gen_ocaml_config.ml.in.3)
    (checksum
-    sha256=22eb7c0211fc426028e444b272b97eac1e8287a49a512aebaa33c608652cfd29)))
+    sha256=a9ad8d84a08961159653a978db92d10f694510182b206cacb96d5c9f63b5121e)))
  (ocaml-config.install
   (fetch
    (url

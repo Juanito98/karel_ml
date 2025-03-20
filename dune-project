@@ -21,7 +21,7 @@
  (description "A longer description")
  (depends
   (ocaml
-   (< 5.0))
+   (< 5.3))
   menhir
   core
   core_unix

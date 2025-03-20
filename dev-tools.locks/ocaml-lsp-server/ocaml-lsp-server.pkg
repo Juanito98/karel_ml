@@ -1,41 +1,13 @@
-(version 1.20.1-4.14)
+(version 1.21.0+binary-ocaml-5.2.1-built-2025-02-04.2-aarch64-apple-darwin)
 
-(build
+(install
  (progn
-  (when
-   %{pkg-self:dev}
-   (run dune subst))
-  (run dune build -p %{pkg-self:name} -j %{jobs} @install)))
-
-(depends
- dune
- yojson
- base
- lsp
- jsonrpc
- re
- ppx_yojson_conv_lib
- dune-rpc
- chrome-trace
- dyn
- stdune
- fiber
- ocaml
- xdg
- ordering
- dune-build-info
- spawn
- astring
- camlp-streams
- ocamlc-loc
- pp
- csexp
- ocamlformat-rpc-lib
- merlin-lib)
+  (run find . -type d -exec mkdir -p %{prefix}/{} ";")
+  (run find . -type f -exec cp {} %{prefix}/{} ";")))
 
 (source
  (fetch
   (url
-   https://github.com/ocaml/ocaml-lsp/releases/download/1.20.1-4.14/lsp-1.20.1-4.14.tbz)
+   https://github.com/ocaml-dune/ocaml-binary-packages/releases/download/2025-02-04.2/ocaml-lsp-server.1.21.0+binary-ocaml-5.2.1-built-2025-02-04.2-aarch64-apple-darwin.tar.gz)
   (checksum
-   sha256=ace96d00141e6d71156b519b2e36b8dedea7960ad923cfe940406dc807e6af59)))
+   sha256=fa74849d0a2cd74673c09a28a78d106c36a1c013075300a660a8737c625af6df)))

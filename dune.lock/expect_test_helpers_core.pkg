@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -8,6 +8,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/expect_test_helpers_core-v0.16.0.tar.gz)
+   https://github.com/janestreet/expect_test_helpers_core/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=e9e9d20470c0c2028ee495c8b0f9d489347545863306241ab95584ef46e53e8a)))
+   sha256=c8380970589385b459413824ea3b2c959ed0a6600fe088f56eda0e16070880bf)))

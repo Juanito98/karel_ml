@@ -1,38 +1,25 @@
-(version 4.14.2)
+(version 5.2.1)
 
 (install
- (withenv
-  ((= MSYS2_ARG_CONV_EXCL *))
-  (run %{make} install)))
+ (run %{make} install))
 
 (build
- (withenv
-  ((= MSYS2_ARG_CONV_EXCL *))
-  (progn
-   (run
-    ./configure
-    (when
-     (and_absorb_undefined_var
-      %{pkg:system-msvc:installed}
-      %{pkg:arch-x86_64:installed})
-     --host=x86_64-pc-windows)
-    (when
-     (and_absorb_undefined_var
-      %{pkg:system-msvc:installed}
-      %{pkg:arch-x86_32:installed})
-     --host=i686-pc-windows)
-    --prefix=%{prefix}
-    --docdir=%{doc}/ocaml
-    -C
-    CC=cc
-    "ASPP=cc -c")
-   (run %{make} -j%{jobs}))))
+ (progn
+  (run
+   ./configure
+   --prefix=%{prefix}
+   --docdir=%{doc}/ocaml
+   -C
+   CC=cc
+   "ASPP=cc -c")
+  (run %{make} -j%{jobs})))
 
 (source
  (fetch
-  (url https://github.com/ocaml/ocaml/archive/4.14.2.tar.gz)
+  (url
+   https://github.com/ocaml/ocaml/releases/download/5.2.1/ocaml-5.2.1.tar.gz)
   (checksum
-   sha256=c2d706432f93ba85bd3383fa451d74543c32a4e84a1afaf3e8ace18f7f097b43)))
+   sha256=2d0f8090951a97a2c0e5b8a11e90096c0e1791d2e471e4a67f87e3b974044cd0)))
 
 (exported_env
  (= CAML_LD_LIBRARY_PATH "\%{lib}%/stublibs"))

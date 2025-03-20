@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -8,6 +8,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/jane-street-headers-v0.16.0.tar.gz)
+   https://github.com/janestreet/jane-street-headers/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=876d409feeb495487b10010fb601c64829d2aa15f1b156b704ec141337d360ea)))
+   sha256=78fa6084cd067b7a7d930d1fe1cb7eb9dcd1a90c73017e570213b47a3762eb4f)))

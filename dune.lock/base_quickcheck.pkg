@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -11,6 +11,7 @@
  ppx_let
  ppx_sexp_message
  ppx_sexp_value
+ ppxlib_jane
  splittable_random
  dune
  ppxlib)
@@ -18,6 +19,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/base_quickcheck-v0.16.0.tar.gz)
+   https://github.com/janestreet/base_quickcheck/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=88f80a75d224ceed33d0f891e6bb931979ec24397871b3347b8be22ef96d2e7e)))
+   sha256=bb1e7362d52e00cb4c460ee64a05133aee12f120a81a682ceb5fb09d11d8acea)))

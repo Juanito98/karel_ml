@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -17,6 +17,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/ppx_base-v0.16.0.tar.gz)
+   https://github.com/janestreet/ppx_base/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=64835763153d3262a2fa56cf307a351ebfd10cedf504c488ab3bb93f3d9569a3)))
+   sha256=80e7e6c6a704114d1d0989ee9bc01bca45278096c0caf3f2c4ef28d3c12ae61c)))

@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -8,6 +8,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/base_bigstring-v0.16.0.tar.gz)
+   https://github.com/janestreet/base_bigstring/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=19fcbf8fa1fa557d513679413a9087e4ff1cb846cef1e8a78eaffb293fa926c3)))
+   sha256=0c77edb9db4f29797cd5c22dd07fdbe4ff668715be870b86dcc1d849730b8562)))

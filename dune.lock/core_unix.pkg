@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -10,11 +10,11 @@
  expect_test_helpers_core
  jane-street-headers
  jst-config
- ocaml_intrinsics
  ppx_jane
  ppx_optcomp
  sexplib
  timezone
+ uopt
  base-threads
  dune
  spawn)
@@ -22,6 +22,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/core_unix-v0.16.0.tar.gz)
+   https://github.com/janestreet/core_unix/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=4f70a9d3a761799d00c0a207942b4abd9f1a144bbcb19df98021d9fb7bfa9e5f)))
+   sha256=175025e240ed90647d817b1af5e4174bf146505903ed671e645f8a5d5f497182)))

@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -7,7 +7,6 @@
 
 (source
  (fetch
-  (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/stdio-v0.16.0.tar.gz)
+  (url https://github.com/janestreet/stdio/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=61f0b75950614ac5378c6ec0d822cce6463402d919d5810b736fc46522b3a73e)))
+   sha256=e7cb473d4bffcf419f307c658cf2599fab03a2b4fe655bfd0be699f8f7af176e)))

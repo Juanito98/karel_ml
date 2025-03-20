@@ -1,4 +1,4 @@
-(version v0.16.0)
+(version v0.17.0)
 
 (build
  (run dune build -p %{pkg-self:name} -j %{jobs}))
@@ -8,6 +8,6 @@
 (source
  (fetch
   (url
-   https://ocaml.janestreet.com/ocaml-core/v0.16/files/ppx_ignore_instrumentation-v0.16.0.tar.gz)
+   https://github.com/janestreet/ppx_ignore_instrumentation/archive/refs/tags/v0.17.0.tar.gz)
   (checksum
-   sha256=522f50ef213300812658b5ea260299c072c24130502bde7e4f74eeda4c709305)))
+   sha256=529aa92cc08a2ccb76fa361326fa7d4bbdfa2a7489c4f1c3a295658d3c758311)))
