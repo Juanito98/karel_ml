@@ -23,16 +23,15 @@ val world : t -> World.t
 
 val step :
   t ->
-  (Instruction.t, Perms.Read.t) Array.Permissioned.t ->
+  (Instruction.t, read) Array.Permissioned.t ->
   (unit, Run_result.t) Continue_or_stop.t
 (** Executes a single step of computation. *)
 
 val line_step :
   t ->
-  (Instruction.t, Perms.Read.t) Array.Permissioned.t ->
+  (Instruction.t, read) Array.Permissioned.t ->
   (unit, Run_result.t) Continue_or_stop.t
 (** Executes steps until the next LINE instruction. *)
 
-val run :
-  t -> (Instruction.t, Perms.Read.t) Array.Permissioned.t -> Run_result.t
+val run : t -> (Instruction.t, read) Array.Permissioned.t -> Run_result.t
 (** Executes the full program. *)

@@ -6,7 +6,7 @@ type position = Lexing.position = {
   pos_bol : int;
   pos_cnum : int;
 }
-[@@deriving sexp]
+[@@deriving sexp_of]
 
 type loc = (position * position[@sexp.opaque]) [@@deriving sexp_of]
 type identifier = string [@@deriving sexp_of]

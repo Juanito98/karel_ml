@@ -46,7 +46,7 @@ let create ?(instruction_limit = default_instruction_limit) ?left_limit
     leavebuzzer_counter = Instruction_counter.create ~limit:leavebuzzer_limit;
   }
 
-let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
+let step t (program : (Instruction.t, read) Array.Permissioned.t) =
   let module Array = Array.Permissioned in
   let continue () =
     (* Returns continue, but checks if no violation was made. *)
@@ -186,7 +186,7 @@ let step t (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
           continue ())
 
 let[@tailrec] rec line_step t
-    (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
+    (program : (Instruction.t, read) Array.Permissioned.t) =
   match step t program with
   | Continue_or_stop.Stop result -> Continue_or_stop.Stop result
   | Continue () -> (
@@ -195,8 +195,7 @@ let[@tailrec] rec line_step t
       | Instruction.LINE _ -> Continue ()
       | _ -> line_step t program)
 
-let[@tailrec] rec run t
-    (program : (Instruction.t, Perms.Read.t) Array.Permissioned.t) =
+let[@tailrec] rec run t (program : (Instruction.t, read) Array.Permissioned.t) =
   match step t program with
   | Continue_or_stop.Continue () -> run t program
   | Stop result -> result
