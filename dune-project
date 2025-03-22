@@ -26,6 +26,7 @@
   core
   core_unix
   notty
+  odoc
   ppx_deriving
   ppx_jane
   xml-light)
